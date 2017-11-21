@@ -1,0 +1,2 @@
+module GlobalIssueHelper
+end

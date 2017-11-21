@@ -1,0 +1,25 @@
+<%= title l(:label_issue_new) %>
+
+
+<%= labelled_form_for @issue, :url => global_issue_index_path,
+                             :html => {:id => 'issue-form', :multipart => true} do |f| %>
+  <%= error_messages_for 'issue' %>
+  <%= hidden_field_tag 'copy_from', params[:copy_from] if params[:copy_from] %>
+  <div class="box tabular">
+    <div id="all_attributes">
+    <%= render :partial => 'global_issue/form', :locals => {:f => f} %>
+    </div>
+
+    <p id="attachments_form"><label><%= l(:label_attachment_plural) %></label><%= render :partial => 'attachments/form', :locals => {:container => @issue} %></p>
+
+  </div>
+
+  <%= submit_tag l(:button_create) %>
+  <%= preview_link preview_new_issue_path(:project_id => @issue.project), 'issue-form' %>
+<% end %>
+
+<div id="preview" class="wiki"></div>
+
+<% content_for :header_tags do %>
+    <%= robot_exclusion_tag %>
+<% end %>

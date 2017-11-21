@@ -26,6 +26,7 @@ class GlobalIssueController < ApplicationController
 
   def create
     @errors = []
+    @issues_created = []
     @projects = params[:issue][:project_ids].map(&:presence).compact
     @projects.each do |project_id|
       params[:issue][:project_id] = project_id
@@ -34,6 +35,7 @@ class GlobalIssueController < ApplicationController
       call_hook(:controller_issues_new_before_save, { :params => params, :issue => @issue })
       @issue.save_attachments(params[:attachments] || (params[:issue] && params[:issue][:uploads]))
       if @issue.save
+        @issues_created << "Issue #{@issue.id} created for #{@issue.project}"
         call_hook(:controller_issues_new_after_save, { :params => params, :issue => @issue})
       else
         @errors << "#{@issue.project} => #{@issue.errors.full_messages.join(',')}"
@@ -46,7 +48,7 @@ class GlobalIssueController < ApplicationController
         if @errors.present?
           flash[:error] = @errors.join('<br/>')
         else
-          flash[:notice] = l(:issues_created)
+          flash[:notice] = @issues_created.join('<br/>')
         end
         redirect_to new_global_issue_path
       }

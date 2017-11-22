@@ -1,6 +1,6 @@
 Redmine::Plugin.register :redmine_global_issue do
   name 'Redmine Global Issue plugin'
-  author 'Author name'
+  author 'Bilel kedidi'
   description 'This is a plugin for Redmine'
   version '0.0.1'
   url 'http://example.com/path/to/plugin'

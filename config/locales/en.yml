@@ -2,3 +2,4 @@
 en:
   global_issue: "Global issue"
   issues_created: 'Issues are created'
+  notice_issue_successful_create_with_project: "Issue %{id} created for %{project}."

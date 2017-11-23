@@ -35,7 +35,8 @@ class GlobalIssueController < ApplicationController
       call_hook(:controller_issues_new_before_save, { :params => params, :issue => @issue })
       @issue.save_attachments(params[:attachments] || (params[:issue] && params[:issue][:uploads]))
       if @issue.save
-        @issues_created << "Issue #{@issue.id} created for #{@issue.project}"
+        @issues_created << l(:notice_issue_successful_create_with_project, project: @project.name,
+                             :id => view_context.link_to("##{@issue.id}", issue_path(@issue), :title => @issue.subject))
         call_hook(:controller_issues_new_after_save, { :params => params, :issue => @issue})
       else
         @errors << "#{@issue.project} => #{@issue.errors.full_messages.join(',')}"

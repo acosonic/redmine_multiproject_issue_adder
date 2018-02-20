@@ -26,21 +26,35 @@ class GlobalIssueController < ApplicationController
 
   def create
     @errors = []
-    @issues_created = []
     @projects = params[:issue][:project_ids].map(&:presence).compact
-    @projects.each do |project_id|
+    first_issue = nil
+    @projects.each_with_index  do |project_id, index|
       params[:issue][:project_id] = project_id
       @project = Project.find project_id
       build_new_issue_from_params
       call_hook(:controller_issues_new_before_save, { :params => params, :issue => @issue })
-      @issue.save_attachments(params[:attachments] || (params[:issue] && params[:issue][:uploads]))
-      if @issue.save
-        @issues_created << l(:notice_issue_successful_create_with_project, project: @project.name,
-                             :id => view_context.link_to("##{@issue.id}", issue_path(@issue), :title => @issue.subject))
-        call_hook(:controller_issues_new_after_save, { :params => params, :issue => @issue})
+      if index.zero?
+        @issue.save_attachments(params[:attachments] || (params[:issue] && params[:issue][:uploads]))
+        if @issue.save
+          first_issue = @issue
+          call_hook(:controller_issues_new_after_save, { :params => params, :issue => @issue})
+        else
+          @errors << "#{@issue.project} => #{@issue.errors.full_messages.join(',')}"
+        end
       else
-        @errors << "#{@issue.project} => #{@issue.errors.full_messages.join(',')}"
+        if first_issue and first_issue.attachments.present?
+          @issue.attachments = first_issue.attachments.map do |attachement|
+            attachement.copy(:container => @issue)
+          end
+        end
+        # @issue.save_attachments(params[:attachments] || (params[:issue] && params[:issue][:uploads]))
+        if @issue.save
+          call_hook(:controller_issues_new_after_save, { :params => params, :issue => @issue})
+        else
+          @errors << "#{@issue.project} => #{@issue.errors.full_messages.join(',')}"
+        end
       end
+
 
     end
     respond_to do |format|
@@ -49,7 +63,7 @@ class GlobalIssueController < ApplicationController
         if @errors.present?
           flash[:error] = @errors.join('<br/>')
         else
-          flash[:notice] = @issues_created.join('<br/>')
+          flash[:notice] = l(:issues_created)
         end
         redirect_to new_global_issue_path
       }

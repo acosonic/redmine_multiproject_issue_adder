@@ -15,6 +15,7 @@
   </div>
 
   <%= submit_tag l(:button_create) %>
+  <%= submit_tag l(:button_create_and_continue), :name => 'continue' %>
   <%= preview_link preview_new_issue_path(:project_id => @issue.project), 'issue-form' %>
 <% end %>
 

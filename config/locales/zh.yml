@@ -1,0 +1,5 @@
+# Simplified Chinese strings go here for Rails i18n
+zh:
+  global_issue: "全局问题"
+  issues_created: '问题已创建。'
+  notice_issue_successful_create_with_project: "问题 %{id} 已创建并用于项目 %{project}。"
